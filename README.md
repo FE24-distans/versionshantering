@@ -150,3 +150,47 @@ git push
 # Första gången skriver man: git push -u origin main
 ```
 ---
+### Multi player
+Samtidigt ska Zeke börja jobba med bokning av rum. Eftersom Ann har skapat repot, behöver inte Zeke göra det. Han ska bara klona repot.
+```bash
+# Ladda ner repot från GitHub
+git clone https://github.com/anns-user-name/anns-repo-name.git
+
+# Git skapar en mapp för repot, gå in i den och börja jobba
+cd mappens-namn/
+
+git status
+# Vänta nu! Git rapporterar att branchen är "main"
+# Zeke måste byta branch innan han börjar jobba
+git checkout book-room-feature
+```
+
+Zeke ändrar i index.html och lägger till en ny CSS-fil. Sedan ska han committa det till GitHub, så att Ann kan se ändringarna.
+
+```bash
+# Committa och pusha
+git add index.html book.css
+# Eller: git add --all
+
+git commit -m "Booking styles"
+git push
+
+git status
+# Kontrollera så att allt gick vägen
+```
+
+Ann vill använda Zekes snygga CSS. Eftersom de jobbar i olika branches behöver hon *hämta Zekes ändringar* från branchen Zeke jobbade i. Det gör man med `git merge`. Men innan hon gör det måste hon hämta ner uppdateringar från GitHub, annars känner inte Git på hennes dator till Zekes ändringar.
+
+```bash
+git status
+# Ann måste ha ett "cleant" working directory för att kunna hämta ändringar
+
+git fetch   # fråga GitHub om det har skett några ändringar sen sist
+git status
+
+# Nu kör vi! Hämta ändringarna från Zekes branch
+# och kombinera dem med ändringarna i Anns branch
+git merge book-room-feature
+```
+
+---
