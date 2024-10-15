@@ -53,15 +53,15 @@ Hämta nya uppdateringar från GitHub. Hämtar alla commits som du inte har på 
 Visar vilka branches som finns på din lokala dator. Du kan skapa en ny branch genom att skriva `git branch new-branch-name`.
 
 ### `git checkout branch-name`
-Säger åt git att byta branch. Detta går bara om du är *clean* - se [git commit](#git-commit).
+Säger åt git att byta branch. Detta går bara om du är *clean*.
 
 När man byter branch så uppdateras alla filer i mappen, så att de matchar den valda branchen.
 
 ### `git merge from-branch`
-Se [Konfliktlösning](#konfliktlosning). Hämtar ändringar som gjorts i "from-branch" och kombinerar dem med din aktuella branch. Vi använder det för att kombinera kod. Git försöker lösa det automatiskt, men om två personer gjort ändringar i samma fil får vi en *merge-konflikt*.
+Hämtar ändringar som gjorts i "from-branch" och kombinerar dem med din aktuella branch. Vi använder det för att kombinera kod. Git försöker lösa det automatiskt, men om två personer gjort ändringar i samma fil får vi en *merge-konflikt*.
 
 ### `git reset`
-Se [Ångra och återställa](#angra-och-aterstalla). Används till många olika saker, som har att göra med tidigare commits:
+Används till många olika saker, som har att göra med tidigare commits:
 + ångra `git add` (*unstage*)
 + backa till en tidigare commit utan att ändra filerna
 + se hur en eller flera filer såg ut i en tidigare commit
