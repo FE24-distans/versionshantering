@@ -41,7 +41,8 @@ git remote add origin https://github.com/your-user-name/your-repo-name.git
 ```
 
 ### `git push`
-Skickar alla commits du har gjort till GitHub. Innan du har pushat finns dina commits bara *lokalt*, alltså på din dator.
+Skickar alla commits du har gjort till GitHub. Innan du har pushat finns dina commits bara *lokalt*, alltså på din dator. 
+Första gången behöver du använda `git push -u origin main` för att pusha till repot i GitHub. 
 
 ### `git fetch`
 Ta reda på *om* det finns nya commits på GitHub. Om du skriver `git status` efteråt så får du veta om du är "up to date" eller om det finns nya uppdateringar som du behöver hämta.
@@ -194,3 +195,229 @@ git merge book-room-feature
 ```
 
 ---
+## Konfliktlösning - merge
+
+### Status just nu
+*Tabell över ändringar som gjorts i två olika branches:*
+
+|Anns branch    |Zekes branch   |Resultat  |
+|---------------|---------------|----------|
+|script.js      |               |script.js |
+|               |book.css       |book.css  |
+|index.html (1) |index.html (2) |**MERGE** |
+
+*Git försöker lösa alla sammanslagningar automatiskt. Men det är inte alltid det lyckas.*
+
+Filerna `script.js` och `book.css` löser git självt.
+
+Men eftersom Ann och Zeke har gjort ändringar i samma fil, `index.html`, så behöver Git vår hjälp! Så här ser gamla index.html ut:
+
+```html
+ 1	<!DOCTYPE html>
+ 2	<html lang="en" dir="ltr">
+ 3	<head>
+ 4		<meta charset="utf-8">
+ 5		<title>Boka lokaler </title>
+ 6	</head>
+ 7	<body>
+ 8		<section>
+ 9			<h1> Boka konferensrum </h1>
+10			<ul>
+11				<li> <button>Skatan</button> </li>
+12				<li> <button>Bofinken</button> </li>
+13				<li> <button>Strutsen</button> </li>
+14			</ul>
+15		</section>
+16	</body>
+17	</html>
+```
+
+Ann, som jobbar med sökfunktionen; har lagt till kod för att söka baserat på rummets namn, efter rad 9:
+
+```html
+10  <p> Sök efter rum: <input type="text" placeholder="Namn" /> </p>
+```
+
+Men Zeke, som jobbar med bokningen, har skrivit:
+
+```html
+10  <p> <input type="checkbox" /> Behöver projektor </p>
+11	<ul>
+12		<li> <button>Skatan (8 platser)</button> </li>
+13		<li> <button>Bofinken (5 platser)</button> </li>
+14		<li> <button>Strutsen (12 platser)</button> </li>
+15	</ul>
+```
+
+Git tittar igenom ändringarna.
+
+### Ändring 1
+
+Zekes rad 11-15 är ändringar som bara finns hos Zeke. Git löser konflikten automatiskt genom att ta med raderna.
+
+### Ändring 2
+
+Ann och Zekes rad 10 är olika. Det blir därför en konflikt, som kan lösas på flera sätt:
+1. behålla Anns version
+1. behålla Zekes version
+1. behålla båda raderna - det blir två rader i stället för en
+1. kombinera raderna - det blir en rad med det bästa från båda
+1. ibland behöver vi freestyla och skriva om koden för att det ska fungera rätt
+
+I detta fallet väljer vi alternativ 4. Från rad 10:
+
+```html
+1	<!DOCTYPE html>
+2	<html lang="en" dir="ltr">
+3	<head>
+4		<meta charset="utf-8">
+5		<title>Boka lokaler </title>
+6	</head>
+7	<body>
+8		<section>
+9			<h1> Boka konferensrum </h1>
+10			<p> Sök efter rum: <input type="text" placeholder="Namn" /> </p>
+11 			<p> <input type="checkbox" /> Behöver projektor </p>
+12			<ul>
+13				<li> <button>Skatan (8 platser)</button> </li>
+14				<li> <button>Bofinken (5 platser)</button> </li>
+15				<li> <button>Strutsen (12 platser)</button> </li>
+16			</ul>
+17		</section>
+18	</body>
+19	</html>
+```
+
+Exempel på lösning med strategi 5 - vi skriver om rad 10. Genom att använda koden från båda ändringarna.
+```html
+10a	<p>
+10b		Sök efter rum: <input type="text" placeholder="Namn" />
+10c		<input type="checkbox" /> Behöver projektor
+10d	</p>
+```
+
+### Dags att göra ändringarna
+
+```bash
+git merge book-room-feature
+# Hoppsan! Git rapporterar en merge-konflikt! Så här ser filen ut:
+```
+
+Ann står i sin branch (terminalen är i Anns branch) och hon har gjort en merge med Zekes ändringar. Git markerar konflikten i index.html. Det kommer att dyka upp konfliktmarkörer i filen:
+
+```html
+ 8		<section>
+ 9			<h1> Boka konferensrum </h1>
+10	<<<<<<< HEAD  (vi står i Anns branch)
+11			<p> Sök efter rum: <input type="text" placeholder="Namn" /> </p>
+12	=======
+13			<p> <input type="checkbox" /> Behöver projektor </p>
+14			<ul>
+15				<li> <button>Skatan (8 platser)</button> </li>
+16				<li> <button>Bofinken (5 platser)</button> </li>
+17				<li> <button>Strutsen (12 platser)</button> </li>
+18			</ul>
+19	>>>>>>> book-room-feature  (hämtat från Zekes branch)
+20		</section>
+```
+
+### Lösningen
+
+Ann tar bort konfliktmarkörerna från index.html och gör ändringarna. Sedan committar hon och pushar till GitHub.
+
+```html
+ 8		<section>
+ 9			<h1> Boka konferensrum </h1>
+10			<p> Sök efter rum: <input type="text" placeholder="Namn" /> </p>
+11			<p> <input type="checkbox" /> Behöver projektor </p>
+12			<ul>
+13				<li> <button>Skatan (8 platser)</button> </li>
+14				<li> <button>Bofinken (5 platser)</button> </li>
+15				<li> <button>Strutsen (12 platser)</button> </li>
+16			</ul>
+17		</section>
+```
+
+```bash
+git add index.html
+git commit -m "Merge commit (search and book rooms combined)"
+git push
+```
+
+Nu är konflikten löst!
+
+# Ångra och återställa
+
+Olika sorters ångra är olika svårt! Så länge vi bara jobbar på vår egen dator är det relativt lätt att backa bandet. Men så snart något är uppladdat på GitHub, så kan mina teammedlemmar använda koden. Därför är det svårare att ångra
+
+1. Ångra `git add` - jag har lagt till filer i staging area av misstag
+1. Ångra `git commit` - jag har committat filer av misstag, men inte pushat
+1. Ångra `git push` - jag har pushat en eller flera commits
+1. Specialfall - jag pushade lösenordet till databasen till GitHub
+
+## 1 Ångra git add
+Använd om du har lagt till filer med `git add`, men inte committat än.
+```bash
+# Backa ändringar i en fil
+git reset HEAD fil1.js fil2.js
+
+# Backa alla ändringar
+git reset HEAD
+```
+
+## 2 Ångra git commit
+Använd om du har committat en eller flera gånger, men inte pushat än. Börja med att ta reda på vilken revision du vill backa till.
+
+```bash
+# Se de senaste 5 committsen
+git log --oneline -5
+
+#ce9a71b (HEAD -> main) En commit som jag vill ångra
+#afc4fb6 En commit som jag vill tillbaka till
+```
+
+Varje revision har en unik kod på 7 tecken. Koden för vår mål-revision är `afc4fb6`. Byt ut den mot din eget revisionskod.
+
+```bash
+git reset afc4fb6 --hard
+```
+
+Obs! Flaggan `--hard` talar om att filerna i *working directory* ska slängas. Man kan provköra utan den, om man är osäker.
+
+## 3 Ångra git push
+Hoppsan! Om du har pushat till GitHub, så finns det en risk att någon annan i ditt team har laddat ner dina ändringar och gjort merge med sin kod. Bäst är att göra en ny commit, som återställer koden till det tillstånd du vill att den ska vara i.
+
+1. Prata med alla teammedlemmar, så att de vet att de ska undvika din branch tills du har löst problemet
+1. Skapa en "motsatscommit"
+1. Pusha den
+
+> Exempel: om jag har gjort en commit som lägger till en extra rad, så är motsatscommiten till den, en commit som tar bort raden.
+
+#### `git revert`
+Revert skapar en motsatscommit för en specifik revision. Man måste ange HEAD eller SHA-1 koden.
+```bash
+# ångra bara den senaste, pushade committen
+git revert HEAD
+
+# ångra en specifik commit: afc4fb6
+git revert afc4fb6
+
+# Glöm inte att kontrollera hur det gick!
+git status
+```
+
+#### Ångra flera committs
+Flera revert efter varandra kan klumpas ihop till en commit.
+```bash
+git revert ce9a71b --no-commit
+git revert afc4fb6 --no-commit
+git commit -m "Revert: berätta vad som ingår i committsen du ångrar"
+
+# Kolla så att allt ser bra ut innan du pushar!
+git status
+
+git push
+```
+
+## 4 Pushade känsliga uppgifter
+You're screwed. Det går inte att 100% garantera att ingen kan plocka ut lösenordet ur koden på GitHub. Byt alla lösenord som har läckt.
